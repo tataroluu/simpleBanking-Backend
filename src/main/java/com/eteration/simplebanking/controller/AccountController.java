@@ -2,7 +2,10 @@ package com.eteration.simplebanking.controller;
 
 import com.eteration.simplebanking.dto.AccountRequestDto;
 import com.eteration.simplebanking.dto.TransactionRequestDto;
-import com.eteration.simplebanking.model.*;
+import com.eteration.simplebanking.model.Account;
+import com.eteration.simplebanking.model.DepositTransaction;
+import com.eteration.simplebanking.model.Transaction;
+import com.eteration.simplebanking.model.WithdrawalTransaction;
 import com.eteration.simplebanking.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,8 +54,6 @@ public class AccountController {
         } else {
             return ResponseEntity.badRequest().body(new TransactionStatus("Invalid transaction type", account.getBalance()));
         }
-
-        // İşlem uygula
         accountService.credit(accountNumber, transaction);
         return ResponseEntity.ok(new TransactionStatus("OK", account.getBalance()));
     }
