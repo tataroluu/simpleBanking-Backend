@@ -9,6 +9,6 @@ public class TransactionStatus {
 
     public TransactionStatus(String status, double balance) {
         this.status = status;
-        this.balance = this.balance;
+        this.balance = balance;
     }
 }

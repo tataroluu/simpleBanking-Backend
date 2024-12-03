@@ -44,8 +44,12 @@ public class AccountController {
 
     @PostMapping("/account/credit/{accountNumber}")
     public ResponseEntity<TransactionStatus> credit(@PathVariable @NotBlank String accountNumber,
-                                                    @RequestBody @Valid TransactionRequestDto transactionRequestDto) {
+                                                    @RequestBody @Valid DepositTransaction depositTransaction) {
         Account account = accountService.findAccount(accountNumber);
+
+        TransactionRequestDto transactionRequestDto = new TransactionRequestDto();
+        transactionRequestDto.setType(depositTransaction.getType());
+        transactionRequestDto.setAmount(depositTransaction.getAmount());
 
         Transaction transaction = null;
         if ("DEPOSIT".equalsIgnoreCase(transactionRequestDto.getType())) {
@@ -62,7 +66,12 @@ public class AccountController {
 
     @PostMapping("/account/debit/{accountNumber}")
     public ResponseEntity<TransactionStatus> debit(@PathVariable @NotBlank String accountNumber,
-                                                   @RequestBody @Valid TransactionRequestDto transactionRequestDto) {
+                                                   @RequestBody @Valid DepositTransaction depositTransaction){
+
+        TransactionRequestDto transactionRequestDto = new TransactionRequestDto();
+        transactionRequestDto.setAmount(depositTransaction.getAmount());
+        transactionRequestDto.setAmount(depositTransaction.getAmount());
+
         Account account = accountService.findAccount(accountNumber);
 
         Transaction transaction = null;
