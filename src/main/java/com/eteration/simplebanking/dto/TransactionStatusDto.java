@@ -1,13 +1,13 @@
-package com.eteration.simplebanking.controller;
+package com.eteration.simplebanking.dto;
 
 import lombok.Data;
 
 @Data
-public class TransactionStatus {
+public class TransactionStatusDto {
     private String status;
     private double balance;
 
-    public TransactionStatus(String status, double balance) {
+    public TransactionStatusDto(String status, double balance) {
         this.status = status;
         this.balance = balance;
     }

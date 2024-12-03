@@ -37,7 +37,7 @@ public class Account {
         this.balance = 0.0;
     }
 
-    public void credit(double amount) {
+    public void credit(double amount) throws InsufficientBalanceException{
         validateAmount(amount);
         this.balance += amount;
     }
@@ -50,7 +50,7 @@ public class Account {
         this.balance -= amount;
     }
 
-    public void deposit(double amount) {
+    public void deposit(double amount) throws InsufficientBalanceException {
         validateAmount(amount);
         this.balance += amount;
     }
@@ -63,7 +63,7 @@ public class Account {
         this.balance -= amount;
     }
 
-    public void post(Transaction transaction) {
+    public void post(Transaction transaction) throws InsufficientBalanceException {
         if (transaction == null) {
             throw new IllegalArgumentException("Transaction cannot be null.");
         }
@@ -72,9 +72,9 @@ public class Account {
         transactions.add(transaction);
     }
 
-    private void validateAmount(double amount) {
+    private void validateAmount(double amount){
         if (amount <= 0) {
-            throw new IllegalArgumentException("Transaction amount must be greater than zero.");
+            throw new InsufficientBalanceException("Transaction amount must be greater than zero.");
         }
     }
 }

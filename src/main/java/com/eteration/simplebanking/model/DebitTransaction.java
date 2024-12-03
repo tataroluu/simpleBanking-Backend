@@ -1,7 +1,10 @@
 package com.eteration.simplebanking.model;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
@@ -16,6 +19,9 @@ public class DebitTransaction extends Transaction {
 
     @Override
     public void apply(Account account) {
+        if (account.getBalance() < this.getAmount()) {
+            throw new InsufficientBalanceException("Insufficient balance transaction.");
+        }
         account.setBalance(account.getBalance() - this.getAmount());
     }
 }

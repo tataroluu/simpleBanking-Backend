@@ -2,10 +2,8 @@ package com.eteration.simplebanking.controller;
 
 import com.eteration.simplebanking.dto.AccountRequestDto;
 import com.eteration.simplebanking.dto.TransactionRequestDto;
-import com.eteration.simplebanking.model.Account;
-import com.eteration.simplebanking.model.DepositTransaction;
-import com.eteration.simplebanking.model.Transaction;
-import com.eteration.simplebanking.model.WithdrawalTransaction;
+import com.eteration.simplebanking.dto.TransactionStatusDto;
+import com.eteration.simplebanking.model.*;
 import com.eteration.simplebanking.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,63 +32,65 @@ public class AccountController {
     }
 
     @PostMapping("/{accountId}/transactions")
-    public ResponseEntity<TransactionStatus> processTransaction(
+    public ResponseEntity<TransactionStatusDto> processTransaction(
             @PathVariable String accountId,
             @RequestBody TransactionRequestDto transactionRequest) {
-        accountService.processTransaction(accountId, transactionRequest);
-        Account account = accountService.processTransaction(accountId, transactionRequest);
-        return ResponseEntity.ok(new TransactionStatus("OK", account.getBalance()));
+         Account account = accountService.processTransaction(accountId, transactionRequest);
+        return ResponseEntity.ok(new TransactionStatusDto("OK", account.getBalance()));
     }
 
+
+
     @PostMapping("/account/credit/{accountNumber}")
-    public ResponseEntity<TransactionStatus> credit(@PathVariable @NotBlank String accountNumber,
-                                                    @RequestBody @Valid DepositTransaction depositTransaction) {
+    public ResponseEntity<TransactionStatusDto> credit(@PathVariable @NotBlank String accountNumber,
+                                                    @RequestBody @Valid TransactionRequestDto transactionRequestDto) {
         Account account = accountService.findAccount(accountNumber);
 
-        TransactionRequestDto transactionRequestDto = new TransactionRequestDto();
-        transactionRequestDto.setType(depositTransaction.getType());
-        transactionRequestDto.setAmount(depositTransaction.getAmount());
-
-        Transaction transaction = null;
-        if ("WITHDRAWAL".equalsIgnoreCase(transactionRequestDto.getType())) {
-            transaction = new WithdrawalTransaction(transactionRequestDto.getAmount());
-        } else if ("DEPOSIT".equalsIgnoreCase(transactionRequestDto.getType())) {
-            transaction = new DepositTransaction(transactionRequestDto.getAmount());
-         } else {
-            return ResponseEntity.badRequest().body(new TransactionStatus("Invalid transaction type", account.getBalance()));
+        Transaction transaction;
+        switch (transactionRequestDto.getType().toUpperCase()) {
+            case "WITHDRAWAL":
+                transaction = new WithdrawalTransaction(transactionRequestDto.getAmount());
+                break;
+            case "DEBIT":
+                transaction = new DebitTransaction(transactionRequestDto.getAmount());
+                break;
+            case "DEPOSIT":
+                transaction = new DepositTransaction(transactionRequestDto.getAmount());
+                break;
+            default:
+                return ResponseEntity.badRequest().body(new TransactionStatusDto("Invalid transaction type", account.getBalance()));
         }
+
         accountService.credit(accountNumber, transaction);
-        return ResponseEntity.ok(new TransactionStatus("OK", account.getBalance()));
+        return ResponseEntity.ok(new TransactionStatusDto("OK", account.getBalance()));
     }
 
 
 
     @PostMapping("/account/debit/{accountNumber}")
-    public ResponseEntity<TransactionStatus> debit(@PathVariable @NotBlank String accountNumber,
-                                                   @RequestBody @Valid WithdrawalTransaction withdrawalTransaction){
-
-        TransactionRequestDto transactionRequestDto = new TransactionRequestDto();
-        transactionRequestDto.setAmount(withdrawalTransaction.getAmount());
-        transactionRequestDto.setType(withdrawalTransaction.getType());
+    public ResponseEntity<TransactionStatusDto> debit(@PathVariable @NotBlank String accountNumber,
+                                                   @RequestBody @Valid TransactionRequestDto transactionRequestDto){
 
         Account account = accountService.findAccount(accountNumber);
 
         Transaction transaction = null;
         if ("WITHDRAWAL".equalsIgnoreCase(transactionRequestDto.getType())) {
             transaction = new WithdrawalTransaction(transactionRequestDto.getAmount());
+        } else if ("DEBIT".equalsIgnoreCase(transactionRequestDto.getType())) {
+            transaction = new DebitTransaction(transactionRequestDto.getAmount());
         } else if ("DEPOSIT".equalsIgnoreCase(transactionRequestDto.getType())) {
-            transaction = new DepositTransaction(transactionRequestDto.getAmount());
+                transaction = new DepositTransaction(transactionRequestDto.getAmount());
         } else {
-            return ResponseEntity.badRequest().body(new TransactionStatus("Invalid transaction type", account.getBalance()));
+            return ResponseEntity.badRequest().body(new TransactionStatusDto("Invalid transaction type", account.getBalance()));
         }
 
         try {
             accountService.debit(accountNumber, transaction);
-        } catch (AccountNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (InsufficientBalanceException | AccountNotFoundException e) {
+            return ResponseEntity.badRequest().body(new TransactionStatusDto("Insufficient balance", account.getBalance()));
         }
 
-        return ResponseEntity.ok(new TransactionStatus("OK", account.getBalance()));
+        return ResponseEntity.ok(new TransactionStatusDto("OK", account.getBalance()));
     }
 
 
