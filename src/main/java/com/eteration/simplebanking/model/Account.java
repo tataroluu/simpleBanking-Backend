@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 import static javax.persistence.FetchType.EAGER;
@@ -27,8 +28,8 @@ public class Account {
     @Column(nullable = false)
     private double balance;
 
-    @OneToMany(fetch = EAGER, mappedBy = "account")
-    private Set<Transaction> transactions;
+    @OneToMany(fetch = EAGER, mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Transaction> transactions = new HashSet<>();
 
     public Account(String owner, String accountNumber) {
         this.owner = owner;
