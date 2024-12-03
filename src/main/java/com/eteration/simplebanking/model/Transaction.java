@@ -29,9 +29,6 @@ public abstract class Transaction {
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
-    @Column(nullable = false)
-    private String account_id;
-
     public Transaction(double amount) {
         this.amount = amount;
     }
