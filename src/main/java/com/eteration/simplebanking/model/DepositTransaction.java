@@ -9,16 +9,24 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-
+@Getter
+@Setter
 @Entity
 @DiscriminatorValue("DEPOSIT")
 @NoArgsConstructor
 public class DepositTransaction extends Transaction {
 
+    @Column(name = "type", insertable = false, updatable = false)
+    private String type;
+
     public DepositTransaction(double amount) {
         super(amount);
     }
 
+    public DepositTransaction(double amount, String type) {
+        super(amount);
+        this.type = type;
+    }
 
     @Override
     public void apply(Account account) {

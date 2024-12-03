@@ -22,3 +22,6 @@ VALUES ('CREDIT', 100.0, CURRENT_TIMESTAMP, 3);
 
 INSERT INTO transaction (type, amount, date, account_id)
 VALUES ('DEBIT', 60.0, CURRENT_TIMESTAMP, 3);
+
+INSERT INTO transaction (type, amount, date, account_id)
+VALUES ('DEPOSIT', 60.0, CURRENT_TIMESTAMP, 3);

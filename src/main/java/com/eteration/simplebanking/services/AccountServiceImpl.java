@@ -76,6 +76,9 @@ public class AccountServiceImpl implements AccountService {
             case "WITHDRAWAL":
                 transaction = new WithdrawalTransaction(transactionRequest.getAmount());
                 break;
+            case "CREDIT":
+                transaction = new CreditTransaction(transactionRequest.getAmount());
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported transaction type: " + transactionRequest.getType());
         }

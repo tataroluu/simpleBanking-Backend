@@ -14,7 +14,7 @@ public interface AccountService {
 
     void credit(String accountNumber, Transaction transaction);
 
-    void debit(@NotBlank String accountNumber, Transaction transaction) throws AccountNotFoundException;
+    void debit(String accountNumber, Transaction transaction);
 
     Account findAccount(String accountNumber);
 

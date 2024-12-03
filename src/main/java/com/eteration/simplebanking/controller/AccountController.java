@@ -5,6 +5,7 @@ import com.eteration.simplebanking.dto.TransactionRequestDto;
 import com.eteration.simplebanking.dto.TransactionStatusDto;
 import com.eteration.simplebanking.model.*;
 import com.eteration.simplebanking.services.AccountService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,9 +58,15 @@ public class AccountController {
             case "DEPOSIT":
                 transaction = new DepositTransaction(transactionRequestDto.getAmount());
                 break;
+            case "CREDIT":
+                transaction = new CreditTransaction(transactionRequestDto.getAmount());
+                break;
             default:
                 return ResponseEntity.badRequest().body(new TransactionStatusDto("Invalid transaction type", account.getBalance()));
         }
+
+        transaction.setAccount(account);
+        accountService.credit(accountNumber, transaction);
 
         accountService.credit(accountNumber, transaction);
         return ResponseEntity.ok(new TransactionStatusDto("OK", account.getBalance()));
@@ -84,9 +91,11 @@ public class AccountController {
             return ResponseEntity.badRequest().body(new TransactionStatusDto("Invalid transaction type", account.getBalance()));
         }
 
+        transaction.setAccount(account);
+
         try {
             accountService.debit(accountNumber, transaction);
-        } catch (InsufficientBalanceException | AccountNotFoundException e) {
+        } catch (InsufficientBalanceException e) {
             return ResponseEntity.badRequest().body(new TransactionStatusDto("Insufficient balance", account.getBalance()));
         }
 
@@ -101,6 +110,7 @@ public class AccountController {
         if (account == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+
         return ResponseEntity.ok(account);
     }
 
