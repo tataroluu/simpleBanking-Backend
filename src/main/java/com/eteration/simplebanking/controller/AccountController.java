@@ -66,11 +66,11 @@ public class AccountController {
 
     @PostMapping("/account/debit/{accountNumber}")
     public ResponseEntity<TransactionStatus> debit(@PathVariable @NotBlank String accountNumber,
-                                                   @RequestBody @Valid DepositTransaction depositTransaction){
+                                                   @RequestBody @Valid WithdrawalTransaction withdrawalTransaction){
 
         TransactionRequestDto transactionRequestDto = new TransactionRequestDto();
-        transactionRequestDto.setAmount(depositTransaction.getAmount());
-        transactionRequestDto.setAmount(depositTransaction.getAmount());
+        transactionRequestDto.setAmount(withdrawalTransaction.getAmount());
+        transactionRequestDto.setAmount(withdrawalTransaction.getAmount());
 
         Account account = accountService.findAccount(accountNumber);
 
