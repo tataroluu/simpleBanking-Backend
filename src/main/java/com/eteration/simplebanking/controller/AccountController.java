@@ -52,10 +52,11 @@ public class AccountController {
         transactionRequestDto.setAmount(depositTransaction.getAmount());
 
         Transaction transaction = null;
-        if ("DEPOSIT".equalsIgnoreCase(transactionRequestDto.getType())) {
+        if ("WITHDRAWAL".equalsIgnoreCase(transactionRequestDto.getType())) {
+            transaction = new WithdrawalTransaction(transactionRequestDto.getAmount());
+        } else if ("DEPOSIT".equalsIgnoreCase(transactionRequestDto.getType())) {
             transaction = new DepositTransaction(transactionRequestDto.getAmount());
-            transaction.setAccount(account);
-        } else {
+         } else {
             return ResponseEntity.badRequest().body(new TransactionStatus("Invalid transaction type", account.getBalance()));
         }
         accountService.credit(accountNumber, transaction);
@@ -70,7 +71,7 @@ public class AccountController {
 
         TransactionRequestDto transactionRequestDto = new TransactionRequestDto();
         transactionRequestDto.setAmount(withdrawalTransaction.getAmount());
-        transactionRequestDto.setAmount(withdrawalTransaction.getAmount());
+        transactionRequestDto.setType(withdrawalTransaction.getType());
 
         Account account = accountService.findAccount(accountNumber);
 
